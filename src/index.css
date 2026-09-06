@@ -580,3 +580,23 @@ body {
   0% { box-shadow: 0 0 5px var(--gold-accent); }
   100% { box-shadow: 0 0 18px var(--gold-accent); }
 }
+
+/* Active Turn Seat Box Highlight */
+.seat-box.turn-highlight .player-badge {
+  border-color: var(--gold-accent);
+  box-shadow: 0 0 20px var(--gold-glow);
+  transform: scale(1.08);
+  animation: turnPulse 1.4s infinite alternate ease-in-out;
+}
+
+@keyframes turnPulse {
+  0% {
+    box-shadow: 0 0 10px rgba(229, 193, 88, 0.4);
+    transform: scale(1.03);
+  }
+  100% {
+    box-shadow: 0 0 25px rgba(229, 193, 88, 0.9);
+    transform: scale(1.09);
+  }
+}
+

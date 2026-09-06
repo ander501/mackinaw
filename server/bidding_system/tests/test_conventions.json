@@ -1,0 +1,67 @@
+{
+    "ace_asking": {
+        "gerber": {
+            "enabled": true,
+            "continuations": true,
+            "responses_map": ["4D", "4H", "4S", "4NT"]
+        },
+        "blackwood": {
+            "enabled": true,
+            "variant": "rkcb",
+            "responses": "1430"
+        }
+    },
+    "notrump_defenses": {
+        "dont": {
+            "enabled": true,
+            "style": "standard"
+        },
+        "unusual_nt": {
+            "enabled": true,
+            "direct": true
+        },
+        "lebensohl": {
+            "enabled": true,
+            "after_interference": true,
+            "fast_denies": true
+        },
+        "meckwell": {
+            "enabled": true,
+            "direct_only": false
+        }
+    },
+    "responses": {
+        "jacoby_2nt": {
+            "enabled": true
+        }
+    },
+    "competitive": {
+        "michaels": {
+            "enabled": true,
+            "strength": "wide_range",
+            "direct_only": true
+        },
+        "support_doubles": {
+            "enabled": true,
+            "thru": "2S"
+        },
+        "cue_bid_raises": {
+            "enabled": true
+        },
+        "reopening_doubles": {
+            "enabled": true
+        },
+        "responsive_doubles": {
+            "enabled": true,
+            "thru_level": 3
+        }
+    },
+    "preempts": {
+        "weak_two": {
+            "enabled": true
+        }
+    },
+    "general": {
+        "vulnerability_adjustments": true
+    }
+}

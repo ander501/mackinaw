@@ -1,0 +1,75 @@
+{
+    "ace_asking": {
+        "gerber": {
+            "enabled": true,
+            "continuations": true,
+            "# info": "responses_map maps index->[bid] for 0,1,2,3 aces. index 0 is also used for 4 aces",
+            "responses_map": ["4D", "4H", "4S", "4NT"]
+        },
+        "blackwood": {
+            "enabled": true,
+            "variant": "rkcb",
+            "responses": "1430"
+        }
+    },
+    "notrump_defenses": {
+        "dont": {
+            "enabled": true,
+            "style": "standard"
+        },
+        "unusual_nt": {
+            "enabled": true,
+            "direct": true,
+            "passed_hand": false
+        },
+        "lebensohl": {
+            "enabled": true,
+            "after_interference": true,
+            "fast_denies": true
+        }
+    },
+    "responses": {
+        "jacoby_2nt": {
+            "enabled": true,
+            "description": "When responder has 4+ card support for partner's 1H/1S and 13+ HCP, 2NT is Jacoby (game forcing)."
+        }
+    },
+    "notrump_responses": {
+        "stayman": {
+            "enabled": true
+        },
+        "jacoby_transfers": {
+            "enabled": true
+        }
+    },
+    "competitive": {
+        "michaels": {
+            "enabled": true,
+            "strength": "wide_range",
+            "direct_only": true
+        },
+        "responsive_doubles": {
+            "enabled": true,
+            "thru_level": 3,
+            "min_strength": 8
+        },
+        "negative_doubles": {
+            "enabled": true,
+            "thru_level": 3
+        },
+        "maximal_doubles": {
+            "enabled": true
+        }
+    },
+    "strong_club_defenses": {
+        "meckwell": {
+            "enabled": true,
+            "style": "standard"
+        }
+    },
+    "general": {
+        "vulnerability_adjustments": true,
+        "passed_hand_variations": true,
+        "balance_of_power": true
+    }
+}

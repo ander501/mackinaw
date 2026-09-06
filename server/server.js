@@ -22,7 +22,7 @@ import {
   calculateScore
 } from './gameEngine.js';
 
-import { generateBotBid, generateBotPlay } from './ai.js';
+import { generateBotBid, generateBotBidDetailed, generateBotPlay } from './ai.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -62,7 +62,6 @@ function loadRoomsFromDisk() {
         const data = JSON.parse(content);
         for (const id in data) {
           const room = data[id];
-          // Auto-repair rooms that were saved in a passed-out or stuck state
           if (room.gameState === 'ROUND_OVER' && !room.contract) {
             startNextHand(room);
           }
@@ -82,7 +81,7 @@ function createInitialRoomState(roomId) {
     roomId,
     createdAt: Date.now(),
     seats: {
-      N: null, // { socketId, playerId, name, isBot }
+      N: null,
       E: null,
       S: null,
       W: null
@@ -96,7 +95,6 @@ function createInitialRoomState(roomId) {
     contract: null,
     currentTrick: [],
     lastCompletedTrick: null,
-    waitingForContinue: false,
     ledSuit: null,
     tricksWon: { NS: 0, EW: 0 },
     trickHistory: [],
@@ -112,7 +110,6 @@ function createInitialRoomState(roomId) {
   };
 }
 
-// Load rooms from disk on startup
 loadRoomsFromDisk();
 
 function getRoom(roomId) {
@@ -146,13 +143,10 @@ function sanitizeRoomStateForClient(room, socketId) {
         sanitizedHands[seat] = room.hands[seat] ? room.hands[seat].length : 0;
       }
     } else if (seat === mySeat) {
-      // Always see your own hand
       sanitizedHands[seat] = room.hands[seat];
     } else if (isPlayingPhase && seat === dummy) {
-      // Dummy hand is exposed face up to everyone during play
       sanitizedHands[seat] = room.hands[seat];
     } else if (isPlayingPhase && seat === declarer) {
-      // If mySeat is partner of Declarer, expose Declarer's cards to human partner!
       if (PARTNERSHIPS[mySeat] === PARTNERSHIPS[declarer]) {
         sanitizedHands[seat] = room.hands[seat];
       } else {
@@ -192,8 +186,6 @@ function handleBotTurns(roomId) {
   const room = rooms.get(roomId);
   if (!room) return;
 
-  if (room.waitingForContinue) return;
-
   const currentSeat = room.currentTurn;
   const seatInfo = room.seats[currentSeat];
 
@@ -201,27 +193,39 @@ function handleBotTurns(roomId) {
     return;
   }
 
-  setTimeout(() => {
+  setTimeout(async () => {
     const freshRoom = rooms.get(roomId);
-    if (!freshRoom || freshRoom.waitingForContinue) return;
+    if (!freshRoom) return;
 
     if (freshRoom.gameState === 'BIDDING' && freshRoom.currentTurn === currentSeat) {
       const hand = freshRoom.hands[currentSeat];
-      const botBid = generateBotBid(hand, freshRoom.biddingHistory, currentSeat);
-      processBid(freshRoom, currentSeat, botBid);
+      const botTeam = PARTNERSHIPS[currentSeat];
+      const oppTeam = OPPONENTS[botTeam];
+      const vulWe = freshRoom.rubberScore ? Boolean(freshRoom.rubberScore.vulnerable[botTeam]) : false;
+      const vulThey = freshRoom.rubberScore ? Boolean(freshRoom.rubberScore.vulnerable[oppTeam]) : false;
+
+      const bidResult = await generateBotBidDetailed(
+        hand,
+        freshRoom.biddingHistory,
+        currentSeat,
+        freshRoom.dealer,
+        { we: vulWe, they: vulThey }
+      );
+
+      processBid(freshRoom, currentSeat, bidResult.bid, bidResult.convention);
       broadcastRoomState(roomId);
       handleBotTurns(roomId);
     } else if (freshRoom.gameState === 'PLAYING' && freshRoom.currentTurn === currentSeat) {
       const declarer = freshRoom.contract.declarer;
       const dummy = freshRoom.contract.dummy;
 
-      const declarerInfo = freshRoom.seats[declarer];
-      const dummyInfo = freshRoom.seats[dummy];
-
-      // If either Declarer or Dummy is human, Bot MUST NOT auto-play Declarer or Dummy hand!
-      const hasHumanInPartnership = (declarerInfo && !declarerInfo.isBot) || (dummyInfo && !dummyInfo.isBot);
-      if (hasHumanInPartnership) {
-        return; // Human plays Declarer & Dummy hands!
+      if (currentSeat === declarer || currentSeat === dummy) {
+        const declarerInfo = freshRoom.seats[declarer];
+        const dummyInfo = freshRoom.seats[dummy];
+        const hasHumanInPartnership = (declarerInfo && !declarerInfo.isBot) || (dummyInfo && !dummyInfo.isBot);
+        if (hasHumanInPartnership) {
+          return;
+        }
       }
 
       const handToPlay = freshRoom.hands[currentSeat];
@@ -245,13 +249,14 @@ function handleBotTurns(roomId) {
   }, 900);
 }
 
-function processBid(room, seat, bid) {
+function processBid(room, seat, bid, convention = null) {
   if (!isValidBid(bid, room.biddingHistory, seat)) return false;
 
   room.biddingHistory.push({ seat, bid });
+  const alertText = convention ? ` (${convention})` : '';
   room.chat.push({
     sender: 'System',
-    text: `${SEAT_NAMES[seat]} bid ${bid}`,
+    text: `${SEAT_NAMES[seat]} bid ${bid}${alertText}`,
     timestamp: Date.now()
   });
 
@@ -286,10 +291,6 @@ function processPlayCard(room, playerSeat, cardId) {
   const legalPlays = getLegalPlays(hand, room.currentTrick, room.ledSuit);
   if (!legalPlays.some(c => c.id === cardId)) return false;
 
-  if (room.currentTrick.length === 0) {
-    room.waitingForContinue = false;
-  }
-
   hand.splice(cardIndex, 1);
   if (room.currentTrick.length === 0) {
     room.ledSuit = card.suit;
@@ -321,11 +322,6 @@ function processPlayCard(room, playerSeat, cardId) {
     const totalTricksPlayed = room.tricksWon.NS + room.tricksWon.EW;
     if (totalTricksPlayed === 13) {
       finishHand(room);
-    } else {
-      const winnerInfo = room.seats[winnerSeat];
-      if (winnerInfo && winnerInfo.isBot) {
-        room.waitingForContinue = true;
-      }
     }
   }
 
@@ -384,7 +380,6 @@ function startNextHand(room) {
   room.contract = null;
   room.currentTrick = [];
   room.lastCompletedTrick = null;
-  room.waitingForContinue = false;
   room.ledSuit = null;
   room.tricksWon = { NS: 0, EW: 0 };
   room.trickHistory = [];
@@ -534,16 +529,6 @@ io.on('connection', (socket) => {
       broadcastRoomState(currentRoomId);
       handleBotTurns(currentRoomId);
     }
-  });
-
-  socket.on('continue_trick', () => {
-    if (!currentRoomId) return;
-    const room = rooms.get(currentRoomId);
-    if (!room) return;
-
-    room.waitingForContinue = false;
-    broadcastRoomState(currentRoomId);
-    handleBotTurns(currentRoomId);
   });
 
   socket.on('start_next_hand', () => {

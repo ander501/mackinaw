@@ -1,10 +1,10 @@
 // src/components/Table.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Hand from './Hand';
 import BiddingBox from './BiddingBox';
 import BiddingTable from './BiddingTable';
 import { getLegalPlays } from '../engine/bridgeLogic';
-import { User, Bot, Eye, Play, History, X } from 'lucide-react';
+import { User, Bot, History, X, Settings } from 'lucide-react';
 
 const SEATS = ['N', 'E', 'S', 'W'];
 const SEAT_NAMES = { N: 'North', E: 'East', S: 'South', W: 'West' };
@@ -17,11 +17,19 @@ export default function Table({
   onPlayCard,
   onAddBot,
   onRemoveBot,
-  onClaimSeat,
-  onContinueTrick
+  onClaimSeat
 }) {
   const [showLastTrickModal, setShowLastTrickModal] = useState(false);
   const [showBiddingTableModal, setShowBiddingTableModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+
+  // Table setting for auto-clearing previous trick (default 1.5 seconds = 1500 ms)
+  const [clearDelayMs, setClearDelayMs] = useState(() => {
+    const saved = localStorage.getItem('bridge_clear_delay_ms');
+    return saved !== null ? Number(saved) : 1500;
+  });
+
+  const [visiblePreviousTrick, setVisiblePreviousTrick] = useState(null);
 
   const {
     seats,
@@ -32,14 +40,35 @@ export default function Table({
     contract,
     currentTrick,
     lastCompletedTrick,
-    waitingForContinue,
     biddingHistory,
     tricksWon,
     ledSuit,
     mySeat,
-    isSpectator,
-    systemMessage
+    isSpectator
   } = roomState;
+
+  // Auto-clear previous trick after configured delay (e.g. 1.5s)
+  useEffect(() => {
+    if (currentTrick && currentTrick.length > 0) {
+      setVisiblePreviousTrick(null);
+    } else if (lastCompletedTrick) {
+      setVisiblePreviousTrick(lastCompletedTrick);
+
+      if (clearDelayMs > 0) {
+        const timer = setTimeout(() => {
+          setVisiblePreviousTrick(null);
+        }, clearDelayMs);
+        return () => clearTimeout(timer);
+      }
+    } else {
+      setVisiblePreviousTrick(null);
+    }
+  }, [currentTrick, lastCompletedTrick, clearDelayMs]);
+
+  const handleUpdateDelaySetting = (newDelayMs) => {
+    setClearDelayMs(newDelayMs);
+    localStorage.setItem('bridge_clear_delay_ms', String(newDelayMs));
+  };
 
   const isBiddingPhase = gameState === 'BIDDING';
   const isPlayingPhase = gameState === 'PLAYING';
@@ -47,36 +76,49 @@ export default function Table({
   const dummy = contract ? contract.dummy : null;
   const trumpSuit = contract ? contract.suit : null;
 
-  // Is human allowed to act?
-  let isMyTurnToAct = false;
-  if (isBiddingPhase) {
-    isMyTurnToAct = currentTurn === mySeat;
-  } else if (isPlayingPhase) {
-    if (currentTurn === mySeat) {
-      isMyTurnToAct = true;
-    } else if (currentTurn === dummy && declarer === mySeat) {
-      // Declarer plays for Dummy on Dummy's turn!
-      isMyTurnToAct = true;
-    } else if (declarer && dummy && seats[declarer] && seats[declarer].isBot && mySeat === dummy) {
-      // Human partner of Bot Declarer plays for Declarer or Dummy!
-      if (currentTurn === declarer || currentTurn === dummy) {
-        isMyTurnToAct = true;
-      }
-    }
-  }
-
   // Calculate legal cards for the hand currently to play
   const currentHandCards = hands[currentTurn] && Array.isArray(hands[currentTurn]) ? hands[currentTurn] : [];
   const currentLegalCards = getLegalPlays(currentHandCards, currentTrick, ledSuit);
 
-  const isDisplayingPreviousTrick = currentTrick.length === 0 && lastCompletedTrick;
-  const displayCards = isDisplayingPreviousTrick ? lastCompletedTrick.trick : currentTrick;
+  const isDisplayingPreviousTrick = currentTrick.length === 0 && visiblePreviousTrick;
+  const displayCards = isDisplayingPreviousTrick ? visiblePreviousTrick.trick : currentTrick;
+
+  // Turn guidance text
+  let turnGuidanceText = '';
+  if (isPlayingPhase) {
+    if (currentTurn === dummy) {
+      if (declarer === mySeat) {
+        turnGuidanceText = `★ Your Turn to Play (from Dummy's Hand - ${SEAT_NAMES[dummy]})`;
+      } else {
+        turnGuidanceText = `Turn to Play: ${SEAT_NAMES[dummy]} (Dummy - Played by ${SEAT_NAMES[declarer]})`;
+      }
+    } else if (currentTurn === mySeat) {
+      turnGuidanceText = `★ Your Turn to Play (${SEAT_NAMES[mySeat]})`;
+    } else {
+      turnGuidanceText = `Turn to Play: ${SEAT_NAMES[currentTurn]}`;
+    }
+  } else if (isBiddingPhase) {
+    if (currentTurn === mySeat) {
+      turnGuidanceText = `★ Your Turn to Bid (${SEAT_NAMES[mySeat]})`;
+    } else {
+      turnGuidanceText = `Turn to Bid: ${SEAT_NAMES[currentTurn]}`;
+    }
+  }
 
   return (
     <div className="table-viewport">
       <div className="felt-table">
         {/* Top Control Bar inside Table */}
         <div style={{ position: 'absolute', top: '15px', right: '25px', zIndex: 10, display: 'flex', gap: '8px' }}>
+          <button
+            className="nav-btn"
+            style={{ background: 'rgba(11, 19, 30, 0.85)', borderColor: '#e5c158', color: '#e5c158', fontSize: '0.8rem' }}
+            onClick={() => setShowSettingsModal(true)}
+            title="Table Settings"
+          >
+            <Settings size={14} /> Settings
+          </button>
+
           {biddingHistory.length > 0 && (
             <button
               className="nav-btn"
@@ -97,6 +139,31 @@ export default function Table({
             </button>
           )}
         </div>
+
+        {/* Active Turn Header Banner */}
+        {turnGuidanceText && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '15px',
+              left: '25px',
+              zIndex: 10,
+              background: (currentTurn === mySeat || (currentTurn === dummy && declarer === mySeat))
+                ? 'linear-gradient(135deg, rgba(229, 193, 88, 0.95), rgba(217, 119, 6, 0.95))'
+                : 'rgba(11, 19, 30, 0.85)',
+              color: (currentTurn === mySeat || (currentTurn === dummy && declarer === mySeat)) ? '#0b131e' : '#e5c158',
+              border: '1px solid #e5c158',
+              padding: '6px 16px',
+              borderRadius: '20px',
+              fontSize: '0.85rem',
+              fontWeight: '800',
+              boxShadow: '0 4px 15px rgba(0,0,0,0.5)',
+              letterSpacing: '0.3px'
+            }}
+          >
+            {turnGuidanceText}
+          </div>
+        )}
 
         {/* Tricks Taken Piles (NS and EW) */}
         {isPlayingPhase && (
@@ -189,22 +256,19 @@ export default function Table({
           const isDummy = isPlayingPhase && dummy === seatKey;
           const isDeclarerSeat = isPlayingPhase && declarer === seatKey;
 
-          // Is it my turn to play THIS specific hand?
           let canIPlayThisHand = false;
           if (isPlayingPhase && isTurn) {
             if (seatKey === mySeat) {
               canIPlayThisHand = true;
             } else if (isDummy && declarer === mySeat) {
-              // Declarer plays Dummy's hand on Dummy's turn!
               canIPlayThisHand = true;
             } else if (declarer && dummy && seats[declarer] && seats[declarer].isBot && mySeat === dummy) {
-              // Human partner plays Declarer or Dummy when partnered with Bot Declarer
               canIPlayThisHand = true;
             }
           }
 
           return (
-            <div key={seatKey} className={`seat-box seat-${seatKey}`}>
+            <div key={seatKey} className={`seat-box seat-${seatKey} ${isTurn ? 'turn-highlight' : ''}`}>
               <div className={`player-badge ${isTurn ? 'active-turn' : ''}`}>
                 <span className="seat-label">
                   {SEAT_NAMES[seatKey]} {isDealer ? '(Dealer)' : ''} {isDeclarerSeat ? '(Declarer)' : ''} {isDummy ? '(Dummy)' : ''}
@@ -235,10 +299,21 @@ export default function Table({
                 )}
               </div>
 
-              {/* Declarer / Turn Banner Guidance */}
-              {canIPlayThisHand && isDummy && declarer === mySeat && (
-                <div style={{ fontSize: '0.75rem', color: '#e5c158', fontWeight: '800', marginBottom: '4px' }}>
-                  ★ Declarer's Turn to Play from Dummy
+              {/* Turn Indicator Label above hand */}
+              {isTurn && (
+                <div
+                  style={{
+                    fontSize: '0.75rem',
+                    color: canIPlayThisHand ? '#e5c158' : '#3b82f6',
+                    fontWeight: '800',
+                    marginBottom: '4px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}
+                >
+                  {canIPlayThisHand
+                    ? (isDummy ? '★ YOUR TURN (PLAY DUMMY)' : '★ YOUR TURN TO PLAY')
+                    : `★ ${SEAT_NAMES[seatKey]}'S TURN`}
                 </div>
               )}
 
@@ -281,7 +356,7 @@ export default function Table({
               </div>
             ))}
 
-            {isDisplayingPreviousTrick && (
+            {isDisplayingPreviousTrick && visiblePreviousTrick && (
               <div
                 style={{
                   position: 'absolute',
@@ -296,7 +371,7 @@ export default function Table({
                   boxShadow: '0 4px 10px rgba(0,0,0,0.5)'
                 }}
               >
-                Previous Trick won by {SEAT_NAMES[lastCompletedTrick.winner]}
+                Previous Trick won by {SEAT_NAMES[visiblePreviousTrick.winner]}
               </div>
             )}
 
@@ -306,25 +381,6 @@ export default function Table({
               </div>
             )}
           </div>
-
-          {waitingForContinue && (
-            <div style={{ position: 'absolute', bottom: '15px', zIndex: 25 }}>
-              <button
-                className="copy-btn"
-                style={{
-                  padding: '10px 24px',
-                  fontSize: '0.95rem',
-                  boxShadow: '0 0 20px rgba(229, 193, 88, 0.6)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-                onClick={onContinueTrick}
-              >
-                <Play size={16} fill="#0b131e" /> Continue to Next Trick
-              </button>
-            </div>
-          )}
         </div>
 
         {/* Bidding Box Overlay */}
@@ -337,6 +393,65 @@ export default function Table({
           />
         )}
       </div>
+
+      {/* Table Settings Modal */}
+      {showSettingsModal && (
+        <div className="modal-backdrop" onClick={() => setShowSettingsModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '440px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: '1.1rem', fontWeight: '800', color: '#e5c158', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Settings size={18} /> TABLE SETTINGS
+              </div>
+              <button onClick={() => setShowSettingsModal(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '700', color: '#e2e8f0', marginBottom: '8px' }}>
+                Previous Trick Auto-Clear Delay
+              </label>
+              <p style={{ fontSize: '0.78rem', color: '#94a3b8', marginBottom: '12px' }}>
+                Controls how long completed trick cards remain displayed on table center before clearing automatically.
+              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {[
+                  { label: '1.5 Seconds (Default)', value: 1500 },
+                  { label: '3.0 Seconds', value: 3000 },
+                  { label: 'Instant (0.5s)', value: 500 },
+                  { label: 'Keep Until Next Card Led (Manual)', value: -1 }
+                ].map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => handleUpdateDelaySetting(option.value)}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: '8px',
+                      border: clearDelayMs === option.value ? '2px solid #e5c158' : '1px solid var(--glass-border)',
+                      background: clearDelayMs === option.value ? 'rgba(229, 193, 88, 0.15)' : 'rgba(15, 23, 42, 0.6)',
+                      color: clearDelayMs === option.value ? '#e5c158' : '#cbd5e1',
+                      fontWeight: clearDelayMs === option.value ? '700' : '500',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <span>{option.label}</span>
+                    {clearDelayMs === option.value && <span>✓</span>}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <button className="copy-btn" style={{ width: '100%', padding: '10px' }} onClick={() => setShowSettingsModal(false)}>
+              Done
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Bidding Table Modal */}
       {showBiddingTableModal && (

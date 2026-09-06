@@ -1,8 +1,9 @@
 // test/gameEngine.test.js
 // Unit & Integration Tests for Contract Bridge Rules, AI, and Server Edge Cases
 
-import test from 'node:test';
+import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
+import { closeBiddingDaemon } from '../server/biddingClient.js';
 
 import {
   createDeck,
@@ -18,7 +19,12 @@ import {
   calculateScore
 } from '../server/gameEngine.js';
 
-import { generateBotBid, generateBotPlay } from '../server/ai.js';
+import {
+  generateBotBid,
+  generateBotBidDetailed,
+  generateBotBidDetailedSync,
+  generateBotPlay
+} from '../server/ai.js';
 
 test('1. Deck Creation & HCP Calculation', () => {
   const deck = createDeck();
@@ -162,8 +168,6 @@ test('8. AI Bot Bidding Heuristics', () => {
 });
 
 test('9. Declarer Hand Visibility & Partner Exposing Logic', () => {
-  // Test hand unmasking logic
-  const SEATS = ['N', 'E', 'S', 'W'];
   const PARTNERSHIPS = { N: 'NS', S: 'NS', E: 'EW', W: 'EW' };
 
   const mockRoom = {
@@ -178,20 +182,130 @@ test('9. Declarer Hand Visibility & Partner Exposing Logic', () => {
     hands: {
       N: [{ id: 'H14', suit: 'H', rank: 14 }],
       E: [{ id: 'C2', suit: 'C', rank: 2 }],
-      S: [{ id: 'S14', suit: 'S', rank: 14 }], // Declarer hand
+      S: [{ id: 'S14', suit: 'S', rank: 14 }],
       W: [{ id: 'D2', suit: 'D', rank: 2 }]
     }
   };
 
-  // Simulate sanitizeRoomStateForClient for Human partner socket ('human_N_socket')
-  const mySeat = 'N'; // Human is Dummy, partnered with Bot Declarer ('S')
+  const mySeat = 'N';
   const declarer = mockRoom.contract.declarer;
 
-  const isPartnerOfBotDeclarer = PARTNERSHIPS[mySeat] === PARTNERSHIPS[declarer] && mockRoom.seats[declarer].isBot;
-  assert.equal(isPartnerOfBotDeclarer, true, 'Human partner of Bot Declarer identified');
+  const isPartnerOfDeclarer = PARTNERSHIPS[mySeat] === PARTNERSHIPS[declarer];
+  assert.equal(isPartnerOfDeclarer, true, 'Human partner of Declarer identified');
 
-  // Check that Declarer hand cards are accessible (unmasked)
-  const exposedDeclarerCards = isPartnerOfBotDeclarer ? mockRoom.hands[declarer] : null;
+  const exposedDeclarerCards = isPartnerOfDeclarer ? mockRoom.hands[declarer] : null;
   assert.notEqual(exposedDeclarerCards, null);
   assert.equal(exposedDeclarerCards[0].id, 'S14', 'Human partner must receive unmasked Declarer hand');
 });
+
+test('10. Bot Opponent Opening Lead vs Declarer Control Permissions', () => {
+  const declarer = 'S';
+  const dummy = 'N';
+  const openingLeader = 'W'; // Bot West is opening leader
+
+  const seats = {
+    N: { isBot: true },
+    E: { isBot: true },
+    S: { isBot: false }, // South is Human Declarer
+    W: { isBot: true }  // West is Bot Opponent
+  };
+
+  // Check 1: When currentSeat is openingLeader ('W'), Bot West IS ALLOWED to lead!
+  const currentSeat = openingLeader; // 'W'
+  const isCurrentSeatBot = seats[currentSeat].isBot;
+  assert.equal(isCurrentSeatBot, true);
+
+  let shouldBotPlayCurrentSeat = false;
+  if (currentSeat === declarer || currentSeat === dummy) {
+    const declarerInfo = seats[declarer];
+    const dummyInfo = seats[dummy];
+    const hasHumanInPartnership = (declarerInfo && !declarerInfo.isBot) || (dummyInfo && !dummyInfo.isBot);
+    shouldBotPlayCurrentSeat = !hasHumanInPartnership;
+  } else {
+    // Current seat is an Opponent Bot! Opponent Bot plays its lead/card!
+    shouldBotPlayCurrentSeat = seats[currentSeat].isBot;
+  }
+
+  assert.equal(shouldBotPlayCurrentSeat, true, 'Bot opponent West MUST be allowed to lead!');
+
+  // Check 2: When currentSeat is Declarer ('S'), human plays Declarer hand
+  const declarerTurnSeat = declarer; // 'S'
+  let shouldBotPlayDeclarerSeat = false;
+  if (declarerTurnSeat === declarer || declarerTurnSeat === dummy) {
+    const declarerInfo = seats[declarer];
+    const dummyInfo = seats[dummy];
+    const hasHumanInPartnership = (declarerInfo && !declarerInfo.isBot) || (dummyInfo && !dummyInfo.isBot);
+    shouldBotPlayDeclarerSeat = !hasHumanInPartnership;
+  }
+  assert.equal(shouldBotPlayDeclarerSeat, false, 'Bot must NOT auto-play Declarer hand when Human Declarer is present');
+});
+
+test('11. SAYC 1NT Opening (15-17 HCP Balanced)', () => {
+  // Hand with 16 HCP, 4-3-3-3 balanced distribution
+  const hand1NT = [
+    { suit: 'S', rank: 14 }, { suit: 'S', rank: 13 }, { suit: 'S', rank: 3 }, { suit: 'S', rank: 2 }, // 7 HCP
+    { suit: 'H', rank: 12 }, { suit: 'H', rank: 5 }, { suit: 'H', rank: 4 }, // 2 HCP
+    { suit: 'D', rank: 13 }, { suit: 'D', rank: 8 }, { suit: 'D', rank: 2 }, // 3 HCP
+    { suit: 'C', rank: 14 }, { suit: 'C', rank: 7 }, { suit: 'C', rank: 4 }  // 4 HCP -> Total 16 HCP
+  ];
+
+  const bid = generateBotBid(hand1NT, [], 'N');
+  assert.equal(bid, '1NT', 'Bot must open 1NT with 16 HCP balanced hand');
+});
+
+test('12. SAYC Stayman Convention (2C over partner 1NT with 4-card major)', () => {
+  // Partner opens 1NT, responder has 10 HCP and 4-4 in majors
+  const responderHand = [
+    { suit: 'S', rank: 13 }, { suit: 'S', rank: 12 }, { suit: 'S', rank: 8 }, { suit: 'S', rank: 4 }, // 5 HCP
+    { suit: 'H', rank: 14 }, { suit: 'H', rank: 11 }, { suit: 'H', rank: 9 }, { suit: 'H', rank: 2 }, // 5 HCP -> Total 10 HCP
+    { suit: 'D', rank: 8 }, { suit: 'D', rank: 5 },
+    { suit: 'C', rank: 7 }, { suit: 'C', rank: 4 }, { suit: 'C', rank: 2 }
+  ];
+
+  const auction = [
+    { seat: 'N', bid: '1NT' },
+    { seat: 'E', bid: 'P' }
+  ];
+
+  const result = generateBotBidDetailedSync(responderHand, auction, 'S', 'N');
+  assert.equal(result.bid, '2C', 'Responder must bid 2C (Stayman) over partner 1NT');
+  assert.equal(result.convention, 'Stayman', 'Convention must be tagged as Stayman');
+});
+
+test('13. SAYC Jacoby Transfer Convention (2D transfer to Hearts over 1NT)', () => {
+  // Partner opens 1NT, responder has 10 HCP and 5+ hearts
+  const transferHand = [
+    { suit: 'H', rank: 14 }, { suit: 'H', rank: 13 }, { suit: 'H', rank: 12 }, { suit: 'H', rank: 8 }, { suit: 'H', rank: 2 }, // 9 HCP, 5 Hearts
+    { suit: 'S', rank: 11 }, { suit: 'S', rank: 4 }, // 1 HCP -> Total 10 HCP
+    { suit: 'D', rank: 8 }, { suit: 'D', rank: 5 },
+    { suit: 'C', rank: 7 }, { suit: 'C', rank: 4 }, { suit: 'C', rank: 3 }, { suit: 'C', rank: 2 }
+  ];
+
+  const auction = [
+    { seat: 'N', bid: '1NT' },
+    { seat: 'E', bid: 'P' }
+  ];
+
+  const result = generateBotBidDetailedSync(transferHand, auction, 'S', 'N');
+  assert.equal(result.bid, '2D', 'Responder must bid 2D (Jacoby Transfer) over 1NT with 5+ hearts');
+  assert.equal(result.convention, 'Jacoby Transfer (Hearts)');
+});
+
+test('14. SAYC Strong 2C Opening (22+ HCP)', () => {
+  // Hand with 24 HCP
+  const monsterHand = [
+    { suit: 'S', rank: 14 }, { suit: 'S', rank: 13 }, { suit: 'S', rank: 12 }, { suit: 'S', rank: 11 }, // 10 HCP
+    { suit: 'H', rank: 14 }, { suit: 'H', rank: 13 }, { suit: 'H', rank: 12 }, // 9 HCP
+    { suit: 'D', rank: 14 }, { suit: 'D', rank: 13 }, // 7 HCP -> Total 26 HCP
+    { suit: 'D', rank: 4 }, { suit: 'C', rank: 5 }, { suit: 'C', rank: 4 }, { suit: 'C', rank: 3 }
+  ];
+
+  const bid = generateBotBid(monsterHand, [], 'N');
+  assert.equal(bid, '2C', 'Bot must open 2C with 22+ HCP');
+});
+
+after(() => {
+  closeBiddingDaemon();
+});
+
+

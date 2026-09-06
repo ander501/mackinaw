@@ -1,5 +1,6 @@
 // server/ai.js
 // Smart SAYC (Standard American Yellow Card) Bridge AI Bot for bidding and play
+// Integrated with Python SAYC Bidding System (rajnesh/bridge-bidding-system)
 
 import {
   SUITS,
@@ -10,6 +11,8 @@ import {
   getLegalPlays,
   nextSeat
 } from './gameEngine.js';
+
+import { getSaycBotBid, getSaycBotBidSync } from './biddingClient.js';
 
 function getSuitLengths(hand) {
   const lengths = { S: 0, H: 0, D: 0, C: 0 };
@@ -24,20 +27,19 @@ function getBestSuit(lengths) {
   return sorted[0][0];
 }
 
-export function generateBotBid(hand, biddingHistory, botSeat) {
+// Built-in JavaScript heuristic fallback
+export function generateBotBidFallback(hand, biddingHistory, botSeat) {
   const hcp = calculateHCP(hand);
   const lengths = getSuitLengths(hand);
   const nonPassBids = biddingHistory.filter(b => b.bid !== 'P');
   const lastBidObj = nonPassBids.length > 0 ? nonPassBids[nonPassBids.length - 1] : null;
 
   if (!lastBidObj) {
-    // Standard SAYC: 5-card major opening takes priority with 12+ HCP
     if (hcp >= 12) {
       if (lengths.S >= 5) return '1S';
       if (lengths.H >= 5) return '1H';
     }
 
-    // Balanced 15-17 HCP No Trump opening
     if (hcp >= 15 && hcp <= 17 && Object.values(lengths).every(l => l >= 2)) {
       return '1NT';
     }
@@ -90,6 +92,55 @@ export function generateBotBid(hand, biddingHistory, botSeat) {
   return 'P';
 }
 
+/**
+ * Detailed asynchronous SAYC bot bidding with convention recognition.
+ */
+export async function generateBotBidDetailed(hand, biddingHistory, botSeat, dealer = 'N', vulnerability = null) {
+  try {
+    const saycResult = await getSaycBotBid(hand, biddingHistory, botSeat, dealer, vulnerability);
+    if (saycResult && saycResult.bid && isValidBid(saycResult.bid, biddingHistory, botSeat)) {
+      return {
+        bid: saycResult.bid,
+        convention: saycResult.convention || null
+      };
+    }
+  } catch (err) {
+    console.warn('[ai.js] SAYC engine query failed, falling back to JS heuristic:', err.message);
+  }
+
+  const fallbackBid = generateBotBidFallback(hand, biddingHistory, botSeat);
+  return { bid: fallbackBid, convention: null };
+}
+
+/**
+ * Detailed synchronous SAYC bot bidding with convention recognition.
+ */
+export function generateBotBidDetailedSync(hand, biddingHistory, botSeat, dealer = 'N', vulnerability = null) {
+  try {
+    const saycResult = getSaycBotBidSync(hand, biddingHistory, botSeat, dealer, vulnerability);
+    if (saycResult && saycResult.bid && isValidBid(saycResult.bid, biddingHistory, botSeat)) {
+      return {
+        bid: saycResult.bid,
+        convention: saycResult.convention || null
+      };
+    }
+  } catch (err) {
+    console.warn('[ai.js] SAYC sync query failed, falling back to JS heuristic:', err.message);
+  }
+
+  const fallbackBid = generateBotBidFallback(hand, biddingHistory, botSeat);
+  return { bid: fallbackBid, convention: null };
+}
+
+/**
+ * Primary bot bid generator returning the bid token string.
+ * Preserves backwards compatibility with existing synchronous callers.
+ */
+export function generateBotBid(hand, biddingHistory, botSeat, dealer = 'N', vulnerability = null) {
+  const result = generateBotBidDetailedSync(hand, biddingHistory, botSeat, dealer, vulnerability);
+  return result.bid;
+}
+
 export function generateBotPlay(hand, currentTrick, ledSuit, trumpSuit, dummyHand, isDeclarerControl) {
   const legalPlays = getLegalPlays(hand, currentTrick, ledSuit);
   if (legalPlays.length === 0) return null;
@@ -110,12 +161,13 @@ export function generateBotPlay(hand, currentTrick, ledSuit, trumpSuit, dummyHan
   }
 
   if (trumpSuit && trumpSuit !== 'NT') {
-    const trumps = legalPlays.filter(c => c.suit === trumpSuit);
-    if (trumps.length > 0) {
-      return trumps[trumps.length - 1];
+    const trumpCards = legalPlays.filter(c => c.suit === trumpSuit);
+    if (trumpCards.length > 0) {
+      const sortedTrumps = [...trumpCards].sort((a, b) => a.rank - b.rank);
+      return sortedTrumps[0];
     }
   }
 
-  const sortedByRank = [...legalPlays].sort((a, b) => a.rank - b.rank);
-  return sortedByRank[0];
+  const sortedOther = [...legalPlays].sort((a, b) => a.rank - b.rank);
+  return sortedOther[0];
 }
