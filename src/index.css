@@ -423,76 +423,194 @@ body {
   border-bottom: 2px solid var(--gold-accent) !important;
 }
 
-/* Bidding Box Component */
-.bidding-modal {
-  position: absolute;
-  bottom: 25px;
-  background: rgba(11, 19, 30, 0.95);
-  border: 1px solid var(--gold-accent);
-  border-radius: 16px;
-  padding: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-  z-index: 30;
+/* Bidding Box Component in Sidebar */
+.bidding-box-sidebar {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  width: 340px;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 12px;
+  transition: all 0.3s ease;
 }
 
-.bidding-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
+.bidding-box-sidebar.my-turn {
+  border-color: var(--gold-accent);
+  box-shadow: 0 0 15px rgba(229, 193, 88, 0.2);
+}
+
+.bidding-box-sidebar.waiting-turn {
+  opacity: 0.85;
+}
+
+.bidding-box-header {
+  text-align: center;
+  font-family: var(--font-heading);
+}
+
+.bidding-turn-active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 800;
+  color: var(--gold-accent);
+  font-size: 0.88rem;
+  letter-spacing: 0.5px;
+}
+
+.bidding-glow-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--gold-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--gold-accent);
+  animation: pulse-dot 1.5s infinite;
+}
+
+@keyframes pulse-dot {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+.bidding-turn-waiting {
+  font-size: 0.82rem;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.bidding-special-bar {
+  display: flex;
   gap: 6px;
 }
 
-.bid-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid var(--glass-border);
-  color: var(--text-main);
-  padding: 8px 4px;
-  border-radius: 6px;
+.special-bid-btn {
+  border: none;
+  padding: 8px 10px;
+  border-radius: 8px;
   font-family: var(--font-heading);
-  font-size: 0.85rem;
-  font-weight: 700;
+  font-weight: 800;
+  font-size: 0.82rem;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
-.bid-btn:hover:not(:disabled) {
-  background: var(--gold-accent);
-  color: #0b131e;
-}
-
-.bid-btn:disabled {
-  opacity: 0.3;
+.special-bid-btn:disabled {
+  opacity: 0.35;
   cursor: not-allowed;
-}
-
-.special-bids {
-  display: flex;
-  gap: 8px;
 }
 
 .pass-btn {
   flex: 2;
   background: #15803d;
   color: white;
-  border: none;
-  padding: 8px;
-  border-radius: 6px;
-  font-weight: 800;
-  cursor: pointer;
+}
+
+.pass-btn:hover:not(:disabled) {
+  background: #16a34a;
 }
 
 .double-btn {
-  flex: 1;
+  flex: 1.5;
   background: #b91c1c;
   color: white;
-  border: none;
-  padding: 8px;
-  border-radius: 6px;
+}
+
+.double-btn:hover:not(:disabled) {
+  background: #dc2626;
+}
+
+.redouble-btn {
+  flex: 1.5;
+  background: #7c3aed;
+  color: white;
+}
+
+.redouble-btn:hover:not(:disabled) {
+  background: #8b5cf6;
+}
+
+.bidding-suits-header {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+  text-align: center;
   font-weight: 800;
+  font-size: 0.85rem;
+  padding: 2px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.suit-col-header {
+  color: #f8fafc;
+}
+
+.suit-col-header.red {
+  color: #ef4444;
+}
+
+.suit-col-header.nt {
+  color: var(--gold-accent);
+}
+
+.bidding-levels-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.bidding-level-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+
+.bid-slot-empty {
+  height: 32px;
+}
+
+.bid-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-border);
+  padding: 6px 2px;
+  height: 32px;
+  border-radius: 6px;
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  font-weight: 700;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.bid-btn.bid-red {
+  color: #ef4444;
+}
+
+.bid-btn.bid-black {
+  color: #f8fafc;
+}
+
+.bid-btn.bid-nt {
+  color: var(--gold-accent);
+}
+
+.bid-btn:hover:not(:disabled) {
+  background: var(--gold-accent);
+  color: #0b131e;
+  border-color: var(--gold-accent);
+}
+
+.bid-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 /* Chat Component */
@@ -502,6 +620,35 @@ body {
   flex-direction: column;
   padding: 12px;
   overflow: hidden;
+}
+
+.chat-container.chat-collapsed {
+  flex: 0 0 auto;
+  border-top: 1px solid var(--glass-border);
+  padding: 8px 12px;
+}
+
+.chat-header-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  padding: 2px 0;
+  transition: opacity 0.15s ease;
+}
+
+.chat-header-toggle:hover {
+  opacity: 0.85;
+}
+
+.chat-count-badge {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #94a3b8;
 }
 
 .chat-history {

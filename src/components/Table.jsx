@@ -1,7 +1,6 @@
 // src/components/Table.jsx
 import React, { useState, useEffect } from 'react';
 import Hand from './Hand';
-import BiddingBox from './BiddingBox';
 import BiddingTable from './BiddingTable';
 import { getLegalPlays } from '../engine/bridgeLogic';
 import { User, Bot, History, X, Settings } from 'lucide-react';
@@ -382,16 +381,6 @@ export default function Table({
             )}
           </div>
         </div>
-
-        {/* Bidding Box Overlay */}
-        {isBiddingPhase && (
-          <BiddingBox
-            isMyTurn={currentTurn === mySeat}
-            biddingHistory={biddingHistory}
-            onPlaceBid={onPlaceBid}
-            mySeat={mySeat}
-          />
-        )}
       </div>
 
       {/* Table Settings Modal */}

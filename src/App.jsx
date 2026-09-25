@@ -4,6 +4,7 @@ import { io } from 'socket.io-client';
 import Table from './components/Table';
 import Scorecard from './components/Scorecard';
 import BiddingTable from './components/BiddingTable';
+import BiddingBox from './components/BiddingBox';
 import Chat from './components/Chat';
 import RulesModal from './components/RulesModal';
 import SeatManager from './components/SeatManager';
@@ -229,6 +230,20 @@ export default function App() {
             <BiddingTable biddingHistory={roomState.biddingHistory} dealer={roomState.dealer} />
           </div>
 
+          {/* Bidding Controls (Possible Bids) in Sidebar during Bidding Phase */}
+          {roomState.gameState === 'BIDDING' && (
+            <div style={{ padding: '12px', borderBottom: '1px solid var(--glass-border)' }}>
+              <BiddingBox
+                isMyTurn={roomState.currentTurn === roomState.mySeat}
+                biddingHistory={roomState.biddingHistory}
+                onPlaceBid={handlePlaceBid}
+                mySeat={roomState.mySeat}
+                currentTurn={roomState.currentTurn}
+                seats={roomState.seats}
+              />
+            </div>
+          )}
+
           {roomState.gameState === 'ROUND_OVER' && (
             <div style={{ padding: '12px', textAlign: 'center', background: 'rgba(16, 185, 129, 0.1)', borderBottom: '1px solid rgba(16, 185, 129, 0.3)' }}>
               <button className="copy-btn" style={{ padding: '10px 20px', width: '100%', fontSize: '0.9rem' }} onClick={handleNextHand}>
@@ -248,7 +263,11 @@ export default function App() {
             </div>
           )}
 
-          <Chat chatMessages={roomState.chat} onSendMessage={handleSendMessage} />
+          <Chat
+            chatMessages={roomState.chat}
+            onSendMessage={handleSendMessage}
+            isBiddingPhase={roomState.gameState === 'BIDDING'}
+          />
         </div>
       </div>
 

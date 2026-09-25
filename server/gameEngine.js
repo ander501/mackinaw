@@ -84,10 +84,10 @@ export function getBidValue(bid) {
 }
 
 export function isValidBid(bid, biddingHistory, playerSeat) {
-  const nonPassBids = biddingHistory.filter(b => b.bid !== 'P');
+  const nonPassBids = biddingHistory.filter(b => b.bid !== 'P' && b.bid !== 'Pass');
   const lastNonPass = nonPassBids.length > 0 ? nonPassBids[nonPassBids.length - 1] : null;
 
-  if (bid === 'P') return true;
+  if (bid === 'P' || bid === 'Pass') return true;
 
   if (bid === 'X') {
     if (!lastNonPass) return false;
@@ -102,9 +102,10 @@ export function isValidBid(bid, biddingHistory, playerSeat) {
   }
 
   const newValue = getBidValue(bid);
-  if (!lastNonPass) return true;
+  const lastContractBid = biddingHistory.slice().reverse().find(b => !['P', 'Pass', 'X', 'XX'].includes(b.bid));
+  if (!lastContractBid) return true;
 
-  const lastValue = getBidValue(lastNonPass.bid);
+  const lastValue = getBidValue(lastContractBid.bid);
   return newValue > lastValue;
 }
 

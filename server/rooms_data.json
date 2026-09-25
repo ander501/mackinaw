@@ -1180,7 +1180,7 @@
     "createdAt": 1787522741559,
     "seats": {
       "N": {
-        "socketId": "Jg3wzyr4NpEz3s-1AAAJ",
+        "socketId": "oCzg5WDZIN5OqspfAAAD",
         "playerId": "pid_6rhosdwo",
         "name": "Vaughn",
         "isBot": false
@@ -1205,9 +1205,9 @@
       }
     },
     "spectators": [],
-    "dealer": "W",
-    "currentTurn": "W",
-    "gameState": "ROUND_OVER",
+    "dealer": "S",
+    "currentTurn": "S",
+    "gameState": "RUBBER_OVER",
     "hands": {
       "N": [],
       "E": [],
@@ -1216,16 +1216,20 @@
     },
     "biddingHistory": [
       {
+        "seat": "S",
+        "bid": "1H"
+      },
+      {
         "seat": "W",
         "bid": "P"
       },
       {
         "seat": "N",
-        "bid": "1C"
+        "bid": "3H"
       },
       {
         "seat": "E",
-        "bid": "P"
+        "bid": "X"
       },
       {
         "seat": "S",
@@ -1234,85 +1238,125 @@
       {
         "seat": "W",
         "bid": "P"
+      },
+      {
+        "seat": "N",
+        "bid": "P"
       }
     ],
     "contract": {
-      "bid": "1C",
-      "level": 1,
-      "suit": "C",
-      "multiplier": 1,
-      "declarer": "N",
-      "dummy": "S",
-      "openingLeader": "E",
-      "targetTricks": 7,
+      "bid": "3H",
+      "level": 3,
+      "suit": "H",
+      "multiplier": 2,
+      "declarer": "S",
+      "dummy": "N",
+      "openingLeader": "W",
+      "targetTricks": 9,
       "team": "NS"
     },
     "currentTrick": [],
     "lastCompletedTrick": {
       "trick": [
         {
-          "seat": "S",
-          "card": {
-            "id": "S11",
-            "suit": "S",
-            "rank": 11,
-            "name": "J",
-            "symbol": "♠"
-          }
-        },
-        {
           "seat": "W",
           "card": {
-            "id": "S13",
-            "suit": "S",
-            "rank": 13,
-            "name": "K",
-            "symbol": "♠"
+            "id": "C11",
+            "suit": "C",
+            "rank": 11,
+            "name": "J",
+            "symbol": "♣"
           }
         },
         {
           "seat": "N",
           "card": {
-            "id": "S12",
-            "suit": "S",
-            "rank": 12,
-            "name": "Q",
-            "symbol": "♠"
+            "id": "D5",
+            "suit": "D",
+            "rank": 5,
+            "name": "5",
+            "symbol": "♦"
           }
         },
         {
           "seat": "E",
           "card": {
-            "id": "D8",
-            "suit": "D",
-            "rank": 8,
-            "name": "8",
-            "symbol": "♦"
+            "id": "C13",
+            "suit": "C",
+            "rank": 13,
+            "name": "K",
+            "symbol": "♣"
+          }
+        },
+        {
+          "seat": "S",
+          "card": {
+            "id": "H9",
+            "suit": "H",
+            "rank": 9,
+            "name": "9",
+            "symbol": "♥"
           }
         }
       ],
-      "winner": "W",
-      "ledSuit": "S"
+      "winner": "S",
+      "ledSuit": "C"
     },
     "waitingForContinue": false,
     "ledSuit": null,
     "tricksWon": {
-      "NS": 10,
-      "EW": 3
+      "NS": 11,
+      "EW": 2
     },
     "trickHistory": [
       {
         "trick": [
           {
-            "seat": "E",
+            "seat": "W",
             "card": {
-              "id": "D13",
-              "suit": "D",
+              "id": "H13",
+              "suit": "H",
               "rank": 13,
               "name": "K",
-              "symbol": "♦"
+              "symbol": "♥"
             }
           },
+          {
+            "seat": "N",
+            "card": {
+              "id": "H6",
+              "suit": "H",
+              "rank": 6,
+              "name": "6",
+              "symbol": "♥"
+            }
+          },
+          {
+            "seat": "E",
+            "card": {
+              "id": "H10",
+              "suit": "H",
+              "rank": 10,
+              "name": "10",
+              "symbol": "♥"
+            }
+          },
+          {
+            "seat": "S",
+            "card": {
+              "id": "H14",
+              "suit": "H",
+              "rank": 14,
+              "name": "A",
+              "symbol": "♥"
+            }
+          }
+        ],
+        "winner": "S",
+        "ledSuit": "H"
+      },
+      {
+        "trick": [
           {
             "seat": "S",
             "card": {
@@ -1326,10 +1370,10 @@
           {
             "seat": "W",
             "card": {
-              "id": "D12",
+              "id": "D6",
               "suit": "D",
-              "rank": 12,
-              "name": "Q",
+              "rank": 6,
+              "name": "6",
               "symbol": "♦"
             }
           },
@@ -1342,459 +1386,9 @@
               "name": "A",
               "symbol": "♦"
             }
-          }
-        ],
-        "winner": "N",
-        "ledSuit": "D"
-      },
-      {
-        "trick": [
-          {
-            "seat": "N",
-            "card": {
-              "id": "C14",
-              "suit": "C",
-              "rank": 14,
-              "name": "A",
-              "symbol": "♣"
-            }
           },
           {
             "seat": "E",
-            "card": {
-              "id": "C3",
-              "suit": "C",
-              "rank": 3,
-              "name": "3",
-              "symbol": "♣"
-            }
-          },
-          {
-            "seat": "S",
-            "card": {
-              "id": "C7",
-              "suit": "C",
-              "rank": 7,
-              "name": "7",
-              "symbol": "♣"
-            }
-          },
-          {
-            "seat": "W",
-            "card": {
-              "id": "C6",
-              "suit": "C",
-              "rank": 6,
-              "name": "6",
-              "symbol": "♣"
-            }
-          }
-        ],
-        "winner": "N",
-        "ledSuit": "C"
-      },
-      {
-        "trick": [
-          {
-            "seat": "N",
-            "card": {
-              "id": "C13",
-              "suit": "C",
-              "rank": 13,
-              "name": "K",
-              "symbol": "♣"
-            }
-          },
-          {
-            "seat": "E",
-            "card": {
-              "id": "C4",
-              "suit": "C",
-              "rank": 4,
-              "name": "4",
-              "symbol": "♣"
-            }
-          },
-          {
-            "seat": "S",
-            "card": {
-              "id": "C8",
-              "suit": "C",
-              "rank": 8,
-              "name": "8",
-              "symbol": "♣"
-            }
-          },
-          {
-            "seat": "W",
-            "card": {
-              "id": "C9",
-              "suit": "C",
-              "rank": 9,
-              "name": "9",
-              "symbol": "♣"
-            }
-          }
-        ],
-        "winner": "N",
-        "ledSuit": "C"
-      },
-      {
-        "trick": [
-          {
-            "seat": "N",
-            "card": {
-              "id": "C2",
-              "suit": "C",
-              "rank": 2,
-              "name": "2",
-              "symbol": "♣"
-            }
-          },
-          {
-            "seat": "E",
-            "card": {
-              "id": "C10",
-              "suit": "C",
-              "rank": 10,
-              "name": "10",
-              "symbol": "♣"
-            }
-          },
-          {
-            "seat": "S",
-            "card": {
-              "id": "H2",
-              "suit": "H",
-              "rank": 2,
-              "name": "2",
-              "symbol": "♥"
-            }
-          },
-          {
-            "seat": "W",
-            "card": {
-              "id": "S2",
-              "suit": "S",
-              "rank": 2,
-              "name": "2",
-              "symbol": "♠"
-            }
-          }
-        ],
-        "winner": "E",
-        "ledSuit": "C"
-      },
-      {
-        "trick": [
-          {
-            "seat": "E",
-            "card": {
-              "id": "C12",
-              "suit": "C",
-              "rank": 12,
-              "name": "Q",
-              "symbol": "♣"
-            }
-          },
-          {
-            "seat": "S",
-            "card": {
-              "id": "H4",
-              "suit": "H",
-              "rank": 4,
-              "name": "4",
-              "symbol": "♥"
-            }
-          },
-          {
-            "seat": "W",
-            "card": {
-              "id": "S3",
-              "suit": "S",
-              "rank": 3,
-              "name": "3",
-              "symbol": "♠"
-            }
-          },
-          {
-            "seat": "N",
-            "card": {
-              "id": "C5",
-              "suit": "C",
-              "rank": 5,
-              "name": "5",
-              "symbol": "♣"
-            }
-          }
-        ],
-        "winner": "E",
-        "ledSuit": "C"
-      },
-      {
-        "trick": [
-          {
-            "seat": "E",
-            "card": {
-              "id": "H11",
-              "suit": "H",
-              "rank": 11,
-              "name": "J",
-              "symbol": "♥"
-            }
-          },
-          {
-            "seat": "S",
-            "card": {
-              "id": "H5",
-              "suit": "H",
-              "rank": 5,
-              "name": "5",
-              "symbol": "♥"
-            }
-          },
-          {
-            "seat": "W",
-            "card": {
-              "id": "H7",
-              "suit": "H",
-              "rank": 7,
-              "name": "7",
-              "symbol": "♥"
-            }
-          },
-          {
-            "seat": "N",
-            "card": {
-              "id": "H13",
-              "suit": "H",
-              "rank": 13,
-              "name": "K",
-              "symbol": "♥"
-            }
-          }
-        ],
-        "winner": "N",
-        "ledSuit": "H"
-      },
-      {
-        "trick": [
-          {
-            "seat": "N",
-            "card": {
-              "id": "H12",
-              "suit": "H",
-              "rank": 12,
-              "name": "Q",
-              "symbol": "♥"
-            }
-          },
-          {
-            "seat": "E",
-            "card": {
-              "id": "H3",
-              "suit": "H",
-              "rank": 3,
-              "name": "3",
-              "symbol": "♥"
-            }
-          },
-          {
-            "seat": "S",
-            "card": {
-              "id": "H8",
-              "suit": "H",
-              "rank": 8,
-              "name": "8",
-              "symbol": "♥"
-            }
-          },
-          {
-            "seat": "W",
-            "card": {
-              "id": "H6",
-              "suit": "H",
-              "rank": 6,
-              "name": "6",
-              "symbol": "♥"
-            }
-          }
-        ],
-        "winner": "N",
-        "ledSuit": "H"
-      },
-      {
-        "trick": [
-          {
-            "seat": "N",
-            "card": {
-              "id": "D4",
-              "suit": "D",
-              "rank": 4,
-              "name": "4",
-              "symbol": "♦"
-            }
-          },
-          {
-            "seat": "E",
-            "card": {
-              "id": "D3",
-              "suit": "D",
-              "rank": 3,
-              "name": "3",
-              "symbol": "♦"
-            }
-          },
-          {
-            "seat": "S",
-            "card": {
-              "id": "D11",
-              "suit": "D",
-              "rank": 11,
-              "name": "J",
-              "symbol": "♦"
-            }
-          },
-          {
-            "seat": "W",
-            "card": {
-              "id": "D5",
-              "suit": "D",
-              "rank": 5,
-              "name": "5",
-              "symbol": "♦"
-            }
-          }
-        ],
-        "winner": "S",
-        "ledSuit": "D"
-      },
-      {
-        "trick": [
-          {
-            "seat": "S",
-            "card": {
-              "id": "H14",
-              "suit": "H",
-              "rank": 14,
-              "name": "A",
-              "symbol": "♥"
-            }
-          },
-          {
-            "seat": "W",
-            "card": {
-              "id": "D7",
-              "suit": "D",
-              "rank": 7,
-              "name": "7",
-              "symbol": "♦"
-            }
-          },
-          {
-            "seat": "N",
-            "card": {
-              "id": "S4",
-              "suit": "S",
-              "rank": 4,
-              "name": "4",
-              "symbol": "♠"
-            }
-          },
-          {
-            "seat": "E",
-            "card": {
-              "id": "H10",
-              "suit": "H",
-              "rank": 10,
-              "name": "10",
-              "symbol": "♥"
-            }
-          }
-        ],
-        "winner": "S",
-        "ledSuit": "H"
-      },
-      {
-        "trick": [
-          {
-            "seat": "S",
-            "card": {
-              "id": "H9",
-              "suit": "H",
-              "rank": 9,
-              "name": "9",
-              "symbol": "♥"
-            }
-          },
-          {
-            "seat": "W",
-            "card": {
-              "id": "S8",
-              "suit": "S",
-              "rank": 8,
-              "name": "8",
-              "symbol": "♠"
-            }
-          },
-          {
-            "seat": "N",
-            "card": {
-              "id": "C11",
-              "suit": "C",
-              "rank": 11,
-              "name": "J",
-              "symbol": "♣"
-            }
-          },
-          {
-            "seat": "E",
-            "card": {
-              "id": "S6",
-              "suit": "S",
-              "rank": 6,
-              "name": "6",
-              "symbol": "♠"
-            }
-          }
-        ],
-        "winner": "N",
-        "ledSuit": "H"
-      },
-      {
-        "trick": [
-          {
-            "seat": "N",
-            "card": {
-              "id": "D10",
-              "suit": "D",
-              "rank": 10,
-              "name": "10",
-              "symbol": "♦"
-            }
-          },
-          {
-            "seat": "E",
-            "card": {
-              "id": "D6",
-              "suit": "D",
-              "rank": 6,
-              "name": "6",
-              "symbol": "♦"
-            }
-          },
-          {
-            "seat": "S",
-            "card": {
-              "id": "S7",
-              "suit": "S",
-              "rank": 7,
-              "name": "7",
-              "symbol": "♠"
-            }
-          },
-          {
-            "seat": "W",
             "card": {
               "id": "D9",
               "suit": "D",
@@ -1812,20 +1406,56 @@
           {
             "seat": "N",
             "card": {
-              "id": "S5",
-              "suit": "S",
-              "rank": 5,
-              "name": "5",
-              "symbol": "♠"
+              "id": "D3",
+              "suit": "D",
+              "rank": 3,
+              "name": "3",
+              "symbol": "♦"
             }
           },
           {
             "seat": "E",
             "card": {
-              "id": "S9",
+              "id": "D12",
+              "suit": "D",
+              "rank": 12,
+              "name": "Q",
+              "symbol": "♦"
+            }
+          },
+          {
+            "seat": "S",
+            "card": {
+              "id": "D7",
+              "suit": "D",
+              "rank": 7,
+              "name": "7",
+              "symbol": "♦"
+            }
+          },
+          {
+            "seat": "W",
+            "card": {
+              "id": "D8",
+              "suit": "D",
+              "rank": 8,
+              "name": "8",
+              "symbol": "♦"
+            }
+          }
+        ],
+        "winner": "E",
+        "ledSuit": "D"
+      },
+      {
+        "trick": [
+          {
+            "seat": "E",
+            "card": {
+              "id": "S13",
               "suit": "S",
-              "rank": 9,
-              "name": "9",
+              "rank": 13,
+              "name": "K",
               "symbol": "♠"
             }
           },
@@ -1842,10 +1472,20 @@
           {
             "seat": "W",
             "card": {
-              "id": "S10",
+              "id": "S11",
               "suit": "S",
-              "rank": 10,
-              "name": "10",
+              "rank": 11,
+              "name": "J",
+              "symbol": "♠"
+            }
+          },
+          {
+            "seat": "N",
+            "card": {
+              "id": "S5",
+              "suit": "S",
+              "rank": 5,
+              "name": "5",
               "symbol": "♠"
             }
           }
@@ -1858,23 +1498,95 @@
           {
             "seat": "S",
             "card": {
-              "id": "S11",
-              "suit": "S",
-              "rank": 11,
-              "name": "J",
-              "symbol": "♠"
+              "id": "H2",
+              "suit": "H",
+              "rank": 2,
+              "name": "2",
+              "symbol": "♥"
             }
           },
           {
             "seat": "W",
             "card": {
-              "id": "S13",
-              "suit": "S",
-              "rank": 13,
-              "name": "K",
-              "symbol": "♠"
+              "id": "H4",
+              "suit": "H",
+              "rank": 4,
+              "name": "4",
+              "symbol": "♥"
             }
           },
+          {
+            "seat": "N",
+            "card": {
+              "id": "H12",
+              "suit": "H",
+              "rank": 12,
+              "name": "Q",
+              "symbol": "♥"
+            }
+          },
+          {
+            "seat": "E",
+            "card": {
+              "id": "H5",
+              "suit": "H",
+              "rank": 5,
+              "name": "5",
+              "symbol": "♥"
+            }
+          }
+        ],
+        "winner": "N",
+        "ledSuit": "H"
+      },
+      {
+        "trick": [
+          {
+            "seat": "N",
+            "card": {
+              "id": "H11",
+              "suit": "H",
+              "rank": 11,
+              "name": "J",
+              "symbol": "♥"
+            }
+          },
+          {
+            "seat": "E",
+            "card": {
+              "id": "H7",
+              "suit": "H",
+              "rank": 7,
+              "name": "7",
+              "symbol": "♥"
+            }
+          },
+          {
+            "seat": "S",
+            "card": {
+              "id": "H3",
+              "suit": "H",
+              "rank": 3,
+              "name": "3",
+              "symbol": "♥"
+            }
+          },
+          {
+            "seat": "W",
+            "card": {
+              "id": "H8",
+              "suit": "H",
+              "rank": 8,
+              "name": "8",
+              "symbol": "♥"
+            }
+          }
+        ],
+        "winner": "N",
+        "ledSuit": "H"
+      },
+      {
+        "trick": [
           {
             "seat": "N",
             "card": {
@@ -1888,26 +1600,322 @@
           {
             "seat": "E",
             "card": {
-              "id": "D8",
-              "suit": "D",
+              "id": "S4",
+              "suit": "S",
+              "rank": 4,
+              "name": "4",
+              "symbol": "♠"
+            }
+          },
+          {
+            "seat": "S",
+            "card": {
+              "id": "S3",
+              "suit": "S",
+              "rank": 3,
+              "name": "3",
+              "symbol": "♠"
+            }
+          },
+          {
+            "seat": "W",
+            "card": {
+              "id": "S2",
+              "suit": "S",
+              "rank": 2,
+              "name": "2",
+              "symbol": "♠"
+            }
+          }
+        ],
+        "winner": "N",
+        "ledSuit": "S"
+      },
+      {
+        "trick": [
+          {
+            "seat": "N",
+            "card": {
+              "id": "S10",
+              "suit": "S",
+              "rank": 10,
+              "name": "10",
+              "symbol": "♠"
+            }
+          },
+          {
+            "seat": "E",
+            "card": {
+              "id": "S6",
+              "suit": "S",
+              "rank": 6,
+              "name": "6",
+              "symbol": "♠"
+            }
+          },
+          {
+            "seat": "S",
+            "card": {
+              "id": "S9",
+              "suit": "S",
+              "rank": 9,
+              "name": "9",
+              "symbol": "♠"
+            }
+          },
+          {
+            "seat": "W",
+            "card": {
+              "id": "C2",
+              "suit": "C",
+              "rank": 2,
+              "name": "2",
+              "symbol": "♣"
+            }
+          }
+        ],
+        "winner": "N",
+        "ledSuit": "S"
+      },
+      {
+        "trick": [
+          {
+            "seat": "N",
+            "card": {
+              "id": "S8",
+              "suit": "S",
               "rank": 8,
               "name": "8",
+              "symbol": "♠"
+            }
+          },
+          {
+            "seat": "E",
+            "card": {
+              "id": "S7",
+              "suit": "S",
+              "rank": 7,
+              "name": "7",
+              "symbol": "♠"
+            }
+          },
+          {
+            "seat": "S",
+            "card": {
+              "id": "D10",
+              "suit": "D",
+              "rank": 10,
+              "name": "10",
               "symbol": "♦"
+            }
+          },
+          {
+            "seat": "W",
+            "card": {
+              "id": "C3",
+              "suit": "C",
+              "rank": 3,
+              "name": "3",
+              "symbol": "♣"
+            }
+          }
+        ],
+        "winner": "N",
+        "ledSuit": "S"
+      },
+      {
+        "trick": [
+          {
+            "seat": "N",
+            "card": {
+              "id": "C14",
+              "suit": "C",
+              "rank": 14,
+              "name": "A",
+              "symbol": "♣"
+            }
+          },
+          {
+            "seat": "E",
+            "card": {
+              "id": "C8",
+              "suit": "C",
+              "rank": 8,
+              "name": "8",
+              "symbol": "♣"
+            }
+          },
+          {
+            "seat": "S",
+            "card": {
+              "id": "C7",
+              "suit": "C",
+              "rank": 7,
+              "name": "7",
+              "symbol": "♣"
+            }
+          },
+          {
+            "seat": "W",
+            "card": {
+              "id": "C5",
+              "suit": "C",
+              "rank": 5,
+              "name": "5",
+              "symbol": "♣"
+            }
+          }
+        ],
+        "winner": "N",
+        "ledSuit": "C"
+      },
+      {
+        "trick": [
+          {
+            "seat": "N",
+            "card": {
+              "id": "C4",
+              "suit": "C",
+              "rank": 4,
+              "name": "4",
+              "symbol": "♣"
+            }
+          },
+          {
+            "seat": "E",
+            "card": {
+              "id": "C9",
+              "suit": "C",
+              "rank": 9,
+              "name": "9",
+              "symbol": "♣"
+            }
+          },
+          {
+            "seat": "S",
+            "card": {
+              "id": "C12",
+              "suit": "C",
+              "rank": 12,
+              "name": "Q",
+              "symbol": "♣"
+            }
+          },
+          {
+            "seat": "W",
+            "card": {
+              "id": "C6",
+              "suit": "C",
+              "rank": 6,
+              "name": "6",
+              "symbol": "♣"
+            }
+          }
+        ],
+        "winner": "S",
+        "ledSuit": "C"
+      },
+      {
+        "trick": [
+          {
+            "seat": "S",
+            "card": {
+              "id": "D11",
+              "suit": "D",
+              "rank": 11,
+              "name": "J",
+              "symbol": "♦"
+            }
+          },
+          {
+            "seat": "W",
+            "card": {
+              "id": "D13",
+              "suit": "D",
+              "rank": 13,
+              "name": "K",
+              "symbol": "♦"
+            }
+          },
+          {
+            "seat": "N",
+            "card": {
+              "id": "D4",
+              "suit": "D",
+              "rank": 4,
+              "name": "4",
+              "symbol": "♦"
+            }
+          },
+          {
+            "seat": "E",
+            "card": {
+              "id": "C10",
+              "suit": "C",
+              "rank": 10,
+              "name": "10",
+              "symbol": "♣"
             }
           }
         ],
         "winner": "W",
-        "ledSuit": "S"
+        "ledSuit": "D"
+      },
+      {
+        "trick": [
+          {
+            "seat": "W",
+            "card": {
+              "id": "C11",
+              "suit": "C",
+              "rank": 11,
+              "name": "J",
+              "symbol": "♣"
+            }
+          },
+          {
+            "seat": "N",
+            "card": {
+              "id": "D5",
+              "suit": "D",
+              "rank": 5,
+              "name": "5",
+              "symbol": "♦"
+            }
+          },
+          {
+            "seat": "E",
+            "card": {
+              "id": "C13",
+              "suit": "C",
+              "rank": 13,
+              "name": "K",
+              "symbol": "♣"
+            }
+          },
+          {
+            "seat": "S",
+            "card": {
+              "id": "H9",
+              "suit": "H",
+              "rank": 9,
+              "name": "9",
+              "symbol": "♥"
+            }
+          }
+        ],
+        "winner": "S",
+        "ledSuit": "C"
       }
     ],
     "rubberScore": {
-      "gameIndex": 2,
+      "gameIndex": 3,
       "belowLine": {
-        "NS": 20,
+        "NS": 0,
         "EW": 0
       },
       "gamesWon": {
-        "NS": 1,
+        "NS": 2,
         "EW": 0
       },
       "vulnerable": {
@@ -2020,6 +2028,87 @@
             "pointsDeclarer": 80,
             "pointsDefenders": 0,
             "overtricks": 3,
+            "undertricks": 0
+          }
+        },
+        {
+          "contract": {
+            "bid": "1H",
+            "level": 1,
+            "suit": "H",
+            "multiplier": 2,
+            "declarer": "E",
+            "dummy": "W",
+            "openingLeader": "S",
+            "targetTricks": 7,
+            "team": "EW"
+          },
+          "tricksWon": {
+            "NS": 1,
+            "EW": 12
+          },
+          "score": {
+            "team": "EW",
+            "isMade": true,
+            "belowLine": 60,
+            "aboveLine": 550,
+            "pointsDeclarer": 610,
+            "pointsDefenders": 0,
+            "overtricks": 5,
+            "undertricks": 0
+          }
+        },
+        {
+          "contract": {
+            "bid": "1C",
+            "level": 1,
+            "suit": "C",
+            "multiplier": 1,
+            "declarer": "N",
+            "dummy": "S",
+            "openingLeader": "E",
+            "targetTricks": 7,
+            "team": "NS"
+          },
+          "tricksWon": {
+            "NS": 11,
+            "EW": 2
+          },
+          "score": {
+            "team": "NS",
+            "isMade": true,
+            "belowLine": 20,
+            "aboveLine": 80,
+            "pointsDeclarer": 100,
+            "pointsDefenders": 0,
+            "overtricks": 4,
+            "undertricks": 0
+          }
+        },
+        {
+          "contract": {
+            "bid": "3H",
+            "level": 3,
+            "suit": "H",
+            "multiplier": 2,
+            "declarer": "S",
+            "dummy": "N",
+            "openingLeader": "W",
+            "targetTricks": 9,
+            "team": "NS"
+          },
+          "tricksWon": {
+            "NS": 11,
+            "EW": 2
+          },
+          "score": {
+            "team": "NS",
+            "isMade": true,
+            "belowLine": 180,
+            "aboveLine": 450,
+            "pointsDeclarer": 630,
+            "pointsDefenders": 0,
+            "overtricks": 2,
             "undertricks": 0
           }
         }
@@ -2180,9 +2269,174 @@
         "sender": "System",
         "text": "West bid P",
         "timestamp": 1788724404031
+      },
+      {
+        "sender": "System",
+        "text": "North bid P",
+        "timestamp": 1790301652422
+      },
+      {
+        "sender": "System",
+        "text": "East bid P",
+        "timestamp": 1790301653328
+      },
+      {
+        "sender": "System",
+        "text": "South bid P",
+        "timestamp": 1790301654231
+      },
+      {
+        "sender": "System",
+        "text": "West bid P",
+        "timestamp": 1790301655136
+      },
+      {
+        "sender": "System",
+        "text": "East bid 1H",
+        "timestamp": 1790301656041
+      },
+      {
+        "sender": "System",
+        "text": "South bid X",
+        "timestamp": 1790301656947
+      },
+      {
+        "sender": "System",
+        "text": "West bid P",
+        "timestamp": 1790301657857
+      },
+      {
+        "sender": "System",
+        "text": "North bid P",
+        "timestamp": 1790301680529
+      },
+      {
+        "sender": "System",
+        "text": "East bid P",
+        "timestamp": 1790301681436
+      },
+      {
+        "sender": "System",
+        "text": "South bid P",
+        "timestamp": 1790301779564
+      },
+      {
+        "sender": "System",
+        "text": "West bid P",
+        "timestamp": 1790301780469
+      },
+      {
+        "sender": "System",
+        "text": "North bid P",
+        "timestamp": 1790301791925
+      },
+      {
+        "sender": "System",
+        "text": "East bid P",
+        "timestamp": 1790301792834
+      },
+      {
+        "sender": "System",
+        "text": "West bid P",
+        "timestamp": 1790301793740
+      },
+      {
+        "sender": "System",
+        "text": "North bid 1C",
+        "timestamp": 1790301817991
+      },
+      {
+        "sender": "System",
+        "text": "East bid P",
+        "timestamp": 1790301818899
+      },
+      {
+        "sender": "System",
+        "text": "South bid P",
+        "timestamp": 1790301819805
+      },
+      {
+        "sender": "System",
+        "text": "West bid P",
+        "timestamp": 1790301820715
+      },
+      {
+        "sender": "System",
+        "text": "North bid P",
+        "timestamp": 1790302014216
+      },
+      {
+        "sender": "System",
+        "text": "East bid P",
+        "timestamp": 1790302015124
+      },
+      {
+        "sender": "System",
+        "text": "South bid P",
+        "timestamp": 1790302016036
+      },
+      {
+        "sender": "System",
+        "text": "West bid P",
+        "timestamp": 1790302016941
+      },
+      {
+        "sender": "System",
+        "text": "East bid P",
+        "timestamp": 1790302017846
+      },
+      {
+        "sender": "System",
+        "text": "South bid P",
+        "timestamp": 1790302018751
+      },
+      {
+        "sender": "System",
+        "text": "West bid P",
+        "timestamp": 1790302019662
+      },
+      {
+        "sender": "System",
+        "text": "North bid P",
+        "timestamp": 1790302026248
+      },
+      {
+        "sender": "System",
+        "text": "South bid 1H",
+        "timestamp": 1790302027158
+      },
+      {
+        "sender": "System",
+        "text": "West bid P",
+        "timestamp": 1790302028063
+      },
+      {
+        "sender": "System",
+        "text": "North bid 3H",
+        "timestamp": 1790302208838
+      },
+      {
+        "sender": "System",
+        "text": "East bid X (Negative Double)",
+        "timestamp": 1790302209740
+      },
+      {
+        "sender": "System",
+        "text": "South bid P",
+        "timestamp": 1790302210648
+      },
+      {
+        "sender": "System",
+        "text": "West bid P",
+        "timestamp": 1790302211556
+      },
+      {
+        "sender": "System",
+        "text": "North bid P",
+        "timestamp": 1790302223895
       }
     ],
-    "systemMessage": "Hand Finished! Contract Made. Score updated on Rubber Scorecard."
+    "systemMessage": "RUBBER COMPLETED! NS team won the Rubber with a 700 point bonus!"
   },
   "rubber-yox9xv": {
     "roomId": "rubber-yox9xv",
