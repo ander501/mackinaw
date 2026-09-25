@@ -117,36 +117,37 @@ export function evaluateAuction(biddingHistory, dealer) {
 
   const lastThree = biddingHistory.slice(-3);
   if (lastThree.length === 3 && lastThree.every(b => b.bid === 'P')) {
-    const nonPassBids = biddingHistory.filter(b => b.bid !== 'P');
-    const winningBidObj = nonPassBids[nonPassBids.length - 1];
-
+    let contractBidObj = null;
     let multiplier = 1;
-    let finalBid = winningBidObj.bid;
-    let winningSeat = winningBidObj.seat;
 
     for (let i = biddingHistory.length - 1; i >= 0; i--) {
-      if (biddingHistory[i].bid === 'XX') {
+      const bidToken = biddingHistory[i].bid;
+      if (bidToken === 'XX' && multiplier === 1) {
         multiplier = 4;
-        break;
-      }
-      if (biddingHistory[i].bid === 'X') {
+      } else if (bidToken === 'X' && multiplier === 1) {
         multiplier = 2;
-        break;
-      }
-      if (!['P', 'X', 'XX'].includes(biddingHistory[i].bid)) {
-        finalBid = biddingHistory[i].bid;
-        winningSeat = biddingHistory[i].seat;
+      } else if (!['P', 'Pass', 'X', 'XX'].includes(bidToken)) {
+        contractBidObj = biddingHistory[i];
         break;
       }
     }
 
+    if (!contractBidObj) {
+      return { status: 'PASSED_OUT' };
+    }
+
+    const finalBid = contractBidObj.bid;
     const level = parseInt(finalBid[0], 10);
     const suit = finalBid.slice(1);
-    const winningTeam = PARTNERSHIPS[winningSeat];
+    const winningTeam = PARTNERSHIPS[contractBidObj.seat];
 
-    let declarer = winningSeat;
+    let declarer = contractBidObj.seat;
     for (const b of biddingHistory) {
-      if (PARTNERSHIPS[b.seat] === winningTeam && b.bid.endsWith(suit)) {
+      if (
+        PARTNERSHIPS[b.seat] === winningTeam &&
+        !['P', 'Pass', 'X', 'XX'].includes(b.bid) &&
+        b.bid.slice(1) === suit
+      ) {
         declarer = b.seat;
         break;
       }

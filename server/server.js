@@ -270,7 +270,8 @@ function processBid(room, seat, bid, convention = null) {
       room.contract = auctionResult.contract;
       room.gameState = 'PLAYING';
       room.currentTurn = room.contract.openingLeader;
-      room.systemMessage = `Contract set: ${room.contract.bid} by ${SEAT_NAMES[room.contract.declarer]}. Opening lead: ${SEAT_NAMES[room.contract.openingLeader]}`;
+      const multStr = room.contract.multiplier === 2 ? ' (doubled)' : room.contract.multiplier === 4 ? ' (redoubled)' : '';
+      room.systemMessage = `Contract set: ${room.contract.bid}${multStr} by ${SEAT_NAMES[room.contract.declarer]}. Opening lead: ${SEAT_NAMES[room.contract.openingLeader]}`;
     }
   } else {
     room.currentTurn = nextSeat(seat);
@@ -350,7 +351,6 @@ function finishHand(room) {
     if (room.rubberScore.belowLine[declarerTeam] >= 100) {
       room.rubberScore.gamesWon[declarerTeam]++;
       room.rubberScore.vulnerable[declarerTeam] = true;
-      room.rubberScore.vulnerable[defenderTeam] = true;
 
       room.rubberScore.belowLine = { NS: 0, EW: 0 };
       room.rubberScore.gameIndex++;

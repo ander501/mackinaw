@@ -71,9 +71,11 @@ export default function Scorecard({ rubberScore }) {
         ) : (
           roundsHistory.map((r, i) => (
             <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-              <span>Round {i + 1}: {r.contract.bid} ({r.contract.declarer})</span>
+              <span>Round {i + 1}: {r.contract.bid}{r.contract.multiplier === 2 ? ' (X)' : r.contract.multiplier === 4 ? ' (XX)' : ''} ({r.contract.declarer})</span>
               <span style={{ color: r.score.isMade ? '#10b981' : '#ef4444', fontWeight: '700' }}>
-                {r.score.isMade ? `Made +${r.score.belowLine + r.score.aboveLine}` : `Down -${r.score.aboveLine}`}
+                {r.score.isMade
+                  ? `Made${r.score.overtricks > 0 ? ` +${r.score.overtricks}` : ''} (+${r.score.belowLine + r.score.aboveLine})`
+                  : `Down -${r.score.undertricks ?? 0} (-${r.score.aboveLine})`}
               </span>
             </div>
           ))

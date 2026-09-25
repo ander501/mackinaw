@@ -304,6 +304,115 @@ test('14. SAYC Strong 2C Opening (22+ HCP)', () => {
   assert.equal(bid, '2C', 'Bot must open 2C with 22+ HCP');
 });
 
+test('15. Doubled and Redoubled Auction Evaluation', () => {
+  // Test 1: Doubled contract (1D - X - P - P - P)
+  const doubledAuction = [
+    { seat: 'N', bid: '1D' },
+    { seat: 'E', bid: 'X' },
+    { seat: 'S', bid: 'P' },
+    { seat: 'W', bid: 'P' },
+    { seat: 'N', bid: 'P' }
+  ];
+  const res1 = evaluateAuction(doubledAuction, 'N');
+  assert.equal(res1.status, 'CONTRACT_SET');
+  assert.equal(res1.contract.bid, '1D');
+  assert.equal(res1.contract.level, 1);
+  assert.equal(res1.contract.suit, 'D');
+  assert.equal(res1.contract.multiplier, 2);
+  assert.equal(res1.contract.declarer, 'N');
+  assert.equal(res1.contract.targetTricks, 7);
+
+  // Test 2: Redoubled contract (1D - X - P - P - XX - P - P - P)
+  const redoubledAuction = [
+    { seat: 'N', bid: '1D' },
+    { seat: 'E', bid: 'X' },
+    { seat: 'S', bid: 'P' },
+    { seat: 'W', bid: 'P' },
+    { seat: 'N', bid: 'XX' },
+    { seat: 'E', bid: 'P' },
+    { seat: 'S', bid: 'P' },
+    { seat: 'W', bid: 'P' }
+  ];
+  const res2 = evaluateAuction(redoubledAuction, 'N');
+  assert.equal(res2.status, 'CONTRACT_SET');
+  assert.equal(res2.contract.bid, '1D');
+  assert.equal(res2.contract.level, 1);
+  assert.equal(res2.contract.suit, 'D');
+  assert.equal(res2.contract.multiplier, 4);
+  assert.equal(res2.contract.declarer, 'N');
+  assert.equal(res2.contract.targetTricks, 7);
+
+  // Test 3: Double canceled by subsequent suit bid
+  const canceledDoubleAuction = [
+    { seat: 'N', bid: '1D' },
+    { seat: 'E', bid: 'X' },
+    { seat: 'S', bid: '1S' },
+    { seat: 'W', bid: 'P' },
+    { seat: 'N', bid: 'P' },
+    { seat: 'E', bid: 'P' }
+  ];
+  const res3 = evaluateAuction(canceledDoubleAuction, 'N');
+  assert.equal(res3.status, 'CONTRACT_SET');
+  assert.equal(res3.contract.bid, '1S');
+  assert.equal(res3.contract.multiplier, 1);
+  assert.equal(res3.contract.declarer, 'S');
+});
+
+test('16. Doubled and Redoubled Contract Scoring (calculateScore)', () => {
+  const redoubledContract = {
+    bid: '1D',
+    level: 1,
+    suit: 'D',
+    multiplier: 4,
+    team: 'NS'
+  };
+
+  // 1D (XX) made with 1 overtrick (8 tricks won), Not Vulnerable
+  // Trick points: 1 * 20 * 4 = 80
+  // Overtrick points: 1 * 200 = 200
+  // Insult bonus: 100
+  // Total: 80 + 300 = 380
+  const scoreNonVul = calculateScore(redoubledContract, 8, false);
+  assert.equal(scoreNonVul.isMade, true);
+  assert.equal(scoreNonVul.belowLine, 80);
+  assert.equal(scoreNonVul.aboveLine, 300);
+  assert.equal(scoreNonVul.pointsDeclarer, 380);
+  assert.equal(scoreNonVul.overtricks, 1);
+  assert.equal(scoreNonVul.undertricks, 0);
+
+  // 1D (XX) made with 1 overtrick (8 tricks won), Vulnerable
+  // Trick points: 80
+  // Overtrick points: 1 * 400 = 400
+  // Insult bonus: 100
+  // Total: 80 + 500 = 580
+  const scoreVul = calculateScore(redoubledContract, 8, true);
+  assert.equal(scoreVul.isMade, true);
+  assert.equal(scoreVul.belowLine, 80);
+  assert.equal(scoreVul.aboveLine, 500);
+  assert.equal(scoreVul.pointsDeclarer, 580);
+
+  // 1D (X) made with 1 overtrick (8 tricks won), Not Vulnerable
+  // Trick points: 1 * 20 * 2 = 40
+  // Overtrick points: 1 * 100 = 100
+  // Insult bonus: 50
+  // Total: 40 + 150 = 190
+  const doubledContract = { ...redoubledContract, multiplier: 2 };
+  const scoreDoubled = calculateScore(doubledContract, 8, false);
+  assert.equal(scoreDoubled.isMade, true);
+  assert.equal(scoreDoubled.belowLine, 40);
+  assert.equal(scoreDoubled.aboveLine, 150);
+  assert.equal(scoreDoubled.pointsDeclarer, 190);
+
+  // 1D (XX) down 1 (6 tricks won), Not Vulnerable
+  // Penalty: 100 * 2 = 200 to defenders
+  const scoreDefeated = calculateScore(redoubledContract, 6, false);
+  assert.equal(scoreDefeated.isMade, false);
+  assert.equal(scoreDefeated.belowLine, 0);
+  assert.equal(scoreDefeated.aboveLine, 200);
+  assert.equal(scoreDefeated.pointsDefenders, 200);
+  assert.equal(scoreDefeated.undertricks, 1);
+});
+
 after(() => {
   closeBiddingDaemon();
 });
